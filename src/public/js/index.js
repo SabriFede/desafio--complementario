@@ -1,54 +1,48 @@
 // creamos una instancia de socket.io del lado del cliente ahora:
 const socket = io();
 
-socket.on("products", (data) => {
-    renderProducts(data);
-});
+// creamos una variable para guardar el usuario
 
-//Funcion para renderizar la tabla de productos
-const renderProducts = (products) => {
-    const productsContainer = document.getElementById("productsContainer");
-    productsContainer.innerHTML = "";
+let user;
+const chatBox = document.getElementById("chatBox");
 
-    products.forEach(item => {
-        const card = document.createElement("div");
-        card.classList.add("card");
-        // agrego boton para eliminar:
-        card.innerHTML = `
-        <p> Id ${item.id} </p>
-        <p> Titulo ${item.title} </p>
-        <p> Precio ${item.price} </p>
-        <button> Eliminar Producto </button>
-        `;
-        productsContainer.appendChild(card);
 
-        card.querySelector("button").addEventListener("click", () => {
-            deleteProduct(item.id);
-        });
-    });
-}
+// Sweetalert2: es una libreria que nos permite crear alertas personalizadas
 
-// eliminar producto:
-const deleteProduct = (id) => {
-    socket.emit("deleteProduct", id);
-}
+// swal: es un objeto global de la libreria que nos permite usar los metodos de la libreria
+// Fire es un metodo que nos permite configurar el alerta
 
-// Agregar poroducto
-document.getElementById("btnEnviar").addEventListener("click", () => {
-    addProduct();
-});
+Swal.fire({
+    title: "Identificate",
+    input: "text",
+    text: "Ingresa un usuario para comunicarte en el chat",
+    inputValidator: (value) => {
+        return !value && "Necesitas escribir un nombre para continuar"
+    },
+    allowOutsideclick: false,
+}).then( result => {
+    user = result.value;
+})
 
-const addProduct = () => {
-    const product = {
-        title: document.getElementById("title").value,
-        description: document.getElementById("description").value,
-        price: document.getElementById("price").value,
-        img: document.getElementById("img").value,
-        code: document.getElementById("code").value,
-        stock: document.getElementById("stock").value,
-        category: document.getElementById("category").value,
-        status: document.getElementById("status").value === "true"
-    };
+chatBox.addEventListener("keyup", (event) => {
+    if(event.key === "Enter") {
+        //para evitar que se envien mensajes vacios:
+        if(chatBox.value.trim().length > 0) {
+            //trim nos permite sacar los espacios en blanco del ppio y final de un string
+            //si el mensaje tiene mas de 0 caracteres, lo enviamos al servidor
+            socket.emit("message", {user: user, message: chatBox.value});
+            chatBox.value = "";
+        }
+    } 
+})
 
-    socket.emit("addProduct", product);
-};
+socket.on("message", data => {
+    let log = document.getElementById("messagesLogs");
+    let messages = "";
+
+    data.forEach( message => {
+        messages = messages + `${message.user} dice: ${message.message} <br>`
+    })
+
+    log.innerHTML = messages;
+})
