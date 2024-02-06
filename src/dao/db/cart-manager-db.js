@@ -29,7 +29,7 @@ class CartManager {
     }
 
 
-    async addProducToCart(cartId, productId, quantity = 1) {
+    async addProductToCart(cartId, productId, quantity = 1) {
         try {
             const cart = await this.getCartById(cartId);
             const productExists = cart.products.find(item => item.product.toString() === productId);
@@ -37,7 +37,7 @@ class CartManager {
             if(productExists) {
                 productExists.quantity += quantity;
             } else {
-                cart.product.push({product: productId, quantity});
+                cart.products.push({product: productId, quantity});
             }
 
             cart.markModified("products");

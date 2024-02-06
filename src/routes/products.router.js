@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-const ProductManager = require("../controllers/product-manager.js");
-const productManager = new ProductManager("./src/models/products.json");
+const ProductManager = require("../dao/db/product-manager-db.js");
+const productManager = new ProductManager();
 
 // rutas:
 
-router.get("/products", async (req, res) => {
+router.get("/", async (req, res) => {
     try {
         const limit = req.query.limit;
         const products = await productManager.getProducts();
@@ -26,12 +26,12 @@ router.get("/products", async (req, res) => {
 
 // retorno producto por ID:
 
-router.get("/products/:pid", async (req, res) => {
+router.get("/:pid", async (req, res) => {
     const id = req.params.pid;
 
     try {
         //const productManager = new ProductManager("./src/models/products.json");
-        const product = await productManager.getProductById(parseInt(id));
+        const product = await productManager.getProductById(id);
         if (!product) {
             return res.json({
                 error: "Producto no encontrado"
@@ -49,13 +49,13 @@ router.get("/products/:pid", async (req, res) => {
 
 // creo un nuevo producto
 
-router.post("/products", async (req, res) => {
+router.post("/", async (req, res) => {
     try {
         const newProduct = {
             title: req.body.title,
             description: req.body.description,
             price: req.body.price,
-            image: req.body.image, 
+            img: req.body.img, 
             code: req.body.code,
             stock: req.body.stock,
             category: req.body.category,
@@ -71,15 +71,15 @@ router.post("/products", async (req, res) => {
 });
 
 
-router.put("/products", async (req, res) => {
+router.put("/:pid", async (req, res) => {
     try {
-        const id = req.body.id;
+        const id = req.params.pid;
         const updateProduct = {
             id: id,
             title: req.body.title,
             description: req.body.description,
             price: req.body.price,
-            image: req.body.image, 
+            img: req.body.img, 
             code: req.body.code,
             stock: req.body.stock,
             category: req.body.category,
@@ -89,24 +89,18 @@ router.put("/products", async (req, res) => {
         const updatedProduct = await productManager.updateProduct(id, updateProduct);
         res.json(updatedProduct);
     } catch (error) {
-        console.error ("Error al sctualizar un producto", error);
+        console.error ("Error al actualizar un producto", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
 
 // elimino un producto por id
 
-router.delete("/products/:pid", async (req, res) => {
+router.delete("/:pid", async (req, res) => {
     const id = req.params.pid;
 
     try {
-        //const productManager = new ProductManager("./src/models/products.json");
-        const deleted = await productManager.deleteProductById(parseInt(id));
-        if (!deleted) {
-            return res.json({
-                error: "Producto no encontrado"
-            });
-        }
+        await productManager.deleteProductById(id);
 
         res.json({result: "Producto eliminado exitosamente"});
     } catch (error) {

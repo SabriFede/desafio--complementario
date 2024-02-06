@@ -6,7 +6,6 @@ class ProductManager {
         let { title, description, price, img, code, stock, category, status, thumbnails } = newObject;
 
         try {
-
             if (!title || !description || !price || !img || !code || !stock || !category) {
                 console.log("Todos los datos son obligatorios, por favor completar todos los campos")
                 return;
@@ -86,7 +85,6 @@ class ProductManager {
     async deleteProductById(id) {
         try {
            const deleted = await ProductModel.findByIdAndDelete(id);
-
             if(!deleted) {
                 console.log("No se encontro");
                 return null;

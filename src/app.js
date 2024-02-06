@@ -24,10 +24,18 @@ app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
 //routing
+
+// app.use(express.static("public"));
+// app.use("/static", express.static("public"));
+// app.use("/static", express.static(path.join(__dirname, ".." + "public")));
+
+//Rutas: 
+app.use("/api/products", productsRouter);
+app.use("/api/carts", cartsRouter);
 app.use("/", viewsRouter);
-app.use(express.static("public"));
-app.use("/static", express.static("public"));
-app.use("/static", express.static(path.join(__dirname, ".." + "public")));
+
+
+
 
 //me guardo una referencia a mi servidor
 const server = app.listen(PUERTO, () => {
@@ -35,9 +43,6 @@ const server = app.listen(PUERTO, () => {
 });
 
 
-// obtengo el array de productos
-const ProductManager = require("./controllers/product-manager.js");
-const productManager = new ProductManager("./src/models/products.json");
 
 //Socket.io:
 

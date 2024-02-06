@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose")
+//const { default: mongoose } = require("mongoose")
 
 const mongoose = require("mongoose");
 
@@ -43,3 +43,5 @@ const productSchema = new mongoose.Schema ({
 })
 
 const ProductModel = mongoose.model("products", productSchema);
+
+module.exports = ProductModel;
